@@ -140,7 +140,11 @@ class jeeObject {
 	public static function deadCmd() {
 		$return = array();
 		foreach (jeeObject::all() as $object) {
-			foreach ($object->getConfiguration('summary', '') as $key => $summary) {
+				$sumaries = $object->getConfiguration('summary');
+			if(!is_array($sumaries) || count($sumaries) < 1){
+				continue;
+			}
+			foreach ($sumaries as $key => $summary) {
 				foreach ($summary as $cmdInfo) {
 					if (!cmd::byId(str_replace('#', '', $cmdInfo['cmd']))) {
 						$return[] = array('detail' => 'Résumé ' . $object->getName(), 'help' => config::byKey('object:summary')[$key]['name'], 'who' => $cmdInfo['cmd']);
@@ -747,7 +751,7 @@ class jeeObject {
 	}
 	
 	public function setName($_name) {
-		$_name = str_replace(array('&', '#', ']', '[', '%'), '', $_name);
+		$_name = cleanComponanteName($_name);
 		$this->_changed = utils::attrChanged($this->_changed,$this->name,$_name);
 		$this->name = $_name;
 		return $this;
